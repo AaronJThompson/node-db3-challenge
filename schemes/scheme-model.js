@@ -1,19 +1,17 @@
 const knex = require('knex');
 const db = knex(require('../knexfile').development);
 
+
 const find = () => db('schemes');
 
-const findByID = (id) => db('schemes').where({ id });
+const findById = (id) => db('schemes').where({ id });
 
 const findSteps = (id) => {
-    return db
-        .select(['id', 'schemes.scheme_name', 'step_number', 'instructions'])
-        .from('steps')
-        .join('schemes')
-        .on('steps.scheme_id', 'schemes.id')
-        .where('steps.scheme_id', id );
+    return db('schemes')
+        .select(['steps.id', 'scheme_name', 'step_number', 'instructions'])
+        .join('steps', 'schemes.id', 'steps.scheme_id')
+        .where({ scheme_id: id });
 };
-
 const add = (scheme) => {
     return db('schemes')
         .insert(scheme)
@@ -34,4 +32,13 @@ const remove = async (id) => {
         .where({ id: id })
         .del()
         .then(() => scheme);
+}
+
+module.exports = {
+    find,
+    findById,
+    findSteps,
+    add,
+    update,
+    remove
 }
